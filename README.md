@@ -13,7 +13,7 @@ The application is split into a decoupled **Next.js PWA client** and a **Spring 
 ```mermaid
 graph TB
     %% Client Tier
-    subgraph ClientTier [Client Tier (Next.js PWA)]
+    subgraph ClientTier ["Client Tier (Next.js PWA)"]
         PWA["PWA Web Shell (Next.js App Router)"]
         SW["Workbox Service Worker (Offline Shell)"]
         LC["LocalStorage (Profile Cache)"]
@@ -21,26 +21,26 @@ graph TB
     end
 
     %% Routing Tier
-    subgraph RoutingTier [Routing & Security Tier]
+    subgraph RoutingTier ["Routing & Security Tier"]
         Nginx["Nginx Reverse Proxy (SSL Termination)"]
         Sec["Spring Security (OAuth2 / Stateless Session Filter)"]
     end
 
     %% Application Tier
-    subgraph AppTier [Application Tier (Spring Boot)]
+    subgraph AppTier ["Application Tier (Spring Boot)"]
         DomainServices["Domain-Driven Services (Users, Feeds, Library)"]
         CacheManager["Spring Cache Manager (Actuator / Stats)"]
         FCM["Firebase Admin Service (Push Gateway)"]
     end
 
     %% Data & Cache Tier
-    subgraph DataTier [Persistence & Caching Tier]
-        Neon[("Neon Serverless PostgreSQL (Primary DB)")]
-        Redis[("Redis Memory Cluster (Session & Cache Store)")]
+    subgraph DataTier ["Persistence & Caching Tier"]
+        Neon[("Neon Serverless PostgreSQL - Primary DB")]
+        Redis[("Redis Memory Cluster - Session & Cache Store")]
     end
 
     %% Third-Party Integrations
-    subgraph Integrations [Third-Party Services]
+    subgraph Integrations ["Third-Party Services"]
         GoogleOAuth["Google Identity Provider (OAuth2)"]
         CloudinaryCDN["Cloudinary CDN (Dynamic Transform Engine)"]
     end
@@ -74,9 +74,9 @@ We designed a **subdomain-scoped session handshake** that utilizes shared domain
 sequenceDiagram
     autonumber
     actor User as Student
-    participant Client as Next.js PWA (bsconnect.app)
-    participant API as Spring Boot API (api.bsconnect.app)
-    participant Google as Google Identity Provider
+    participant Client as "Next.js PWA (bsconnect.app)"
+    participant API as "Spring Boot API (api.bsconnect.app)"
+    participant Google as "Google Identity Provider"
 
     User->>Client: Clicks "Login with Google"
     Client->>API: Initiates OAuth2 handshake
@@ -157,15 +157,15 @@ To handle rapid user growth, session management was externalized from relational
 
 ```mermaid
 graph LR
-    Request[HTTP Request] --> API[Spring Boot API]
+    Request["HTTP Request"] --> API["Spring Boot API"]
     
-    subgraph Redis Serialization Pipeline
-        API -->|1. Write Session DTO| Jackson[Jackson JSON Serializer]
-        Jackson -->|2. Plain Text Bytes| GZIP[GZIP Compression Stream]
-        GZIP -->|3. Compressed Payload| Redis[(Redis Cache)]
+    subgraph RedisSerializationPipeline ["Redis Serialization Pipeline"]
+        API -->|1. Write Session DTO| Jackson["Jackson JSON Serializer"]
+        Jackson -->|2. Plain Text Bytes| GZIP["GZIP Compression Stream"]
+        GZIP -->|3. Compressed Payload| Redis[("Redis Cache")]
     end
     
-    Redis -->|4. Read Compressed Bytes| Decompress[GZIP Decompressor]
+    Redis -->|4. Read Compressed Bytes| Decompress["GZIP Decompressor"]
     Decompress -->|5. Plain Text Bytes| Jackson
     Jackson -->|6. Map Session DTO| API
 ```
